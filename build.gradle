@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
+}
+
+group = 'com.gradeanalyzer'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}gh auth login
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+javafx {
+    version = '21'
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
+// Принудительное использование безопасных версий транзитивных зависимостей
+configurations.all {
+    resolutionStrategy {
+        force 'org.apache.commons:commons-lang3:3.17.0'
+        force 'org.apache.commons:commons-compress:1.27.1'
+        force 'commons-io:commons-io:2.18.0'
+        force 'org.apache.logging.log4j:log4j-core:2.24.3'
+    }
+}
+
+dependencies {
+    // Apache POI - последняя безопасная версия
+    implementation 'org.apache.poi:poi:5.4.0'
+    implementation 'org.apache.poi:poi-ooxml:5.4.0'
+
+    // Log4j2 - последняя безопасная версия
+    implementation 'org.apache.logging.log4j:log4j-api:2.24.3'
+    implementation 'org.apache.logging.log4j:log4j-core:2.24.3'
+
+    // JUnit 5 - последняя версия
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.12.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.12.1'
+}
+
+application {
+    mainClass = 'com.gradeanalyzer.ui.MainApp'
+    applicationDefaultJvmArgs = ['-Dfile.encoding=UTF-8']
+}
+
+test {
+    useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.gradeanalyzer.ui.MainApp'
+        )
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
